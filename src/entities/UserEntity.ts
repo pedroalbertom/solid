@@ -6,11 +6,21 @@ export type UserProps = {
 }
 
 export class UserEntity {
-    private constructor(readonly props: UserProps) {}
+    private constructor(readonly props: UserProps) { }
 
-    public static create(props: Omit<UserProps, 'id'>): UserEntity {
-        const id = crypto.randomUUID().toString()
-        return new UserEntity({ ...props, id })
+    public static create(props: Partial<UserProps>): UserEntity {
+        const id = props.id ?? crypto.randomUUID().toString();
+
+        if (!props.firstName || !props.lastName || !props.email) {
+            throw new Error("Campos obrigatórios estão faltando.");
+        }
+
+        return new UserEntity({
+            id,
+            firstName: props.firstName,
+            lastName: props.lastName,
+            email: props.email,
+        });
     }
 
     public getId(): string {

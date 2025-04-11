@@ -8,7 +8,7 @@ export class UserController {
         return res.status(400).json({ error: error.message });
     }
 
-    async create(req: Request, res: Response): Promise<Response> {
+    async create(req: Request, res: Response): Promise<any> {
         try {
             const user = await this.userService.create(req.body);
             return res.status(201).json(user);
@@ -17,7 +17,7 @@ export class UserController {
         }
     }
 
-    async list(req: Request, res: Response): Promise<Response> {
+    async list(req: Request, res: Response): Promise<any> {
         try {
             const users = await this.userService.list();
             return res.status(200).json(users);
@@ -26,7 +26,7 @@ export class UserController {
         }
     }
 
-    async listOne(req: Request, res: Response): Promise<Response> {
+    async listOne(req: Request, res: Response): Promise<any> {
         try {
             const id = req.params.id;
             const user = await this.userService.getById(id);
@@ -36,7 +36,7 @@ export class UserController {
         }
     }
 
-    async update(req: Request, res: Response): Promise<Response> {
+    async update(req: Request, res: Response): Promise<any> {
         try {
             req.body.id = req.params.id;
             await this.userService.update(req.body);
@@ -46,7 +46,7 @@ export class UserController {
         }
     }
 
-    async delete(req: Request, res: Response): Promise<Response> {
+    async delete(req: Request, res: Response): Promise<any> {
         try {
             const id = req.params.id;
             await this.userService.delete(id);

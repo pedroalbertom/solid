@@ -1,4 +1,5 @@
 import { UserEntity } from "../entities/UserEntity";
+import { UserModel } from "../models/UserModels";
 
 export interface IUserRepository {
     create(user: UserEntity): Promise<UserEntity>,
@@ -6,27 +7,56 @@ export interface IUserRepository {
     getById(id: string): Promise<UserEntity>,
     getByEmail(id: string): Promise<UserEntity>,
     update(user: UserEntity): Promise<void>,
-    delete(id: string): Promise<void>,
+    delete(user: UserEntity): Promise<void>,
 }
 
 export class UserRepository implements IUserRepository {
-    create(): Promise<UserEntity> {
-        throw new Error("Method not implemented.");
-    }
-    list(): Promise<UserEntity[]> {
-        throw new Error("Method not implemented.");
-    }
-    getById(): Promise<UserEntity> {
-        throw new Error("Method not implemented.");
-    }
-    getByEmail(): Promise<UserEntity> {
-        throw new Error("Method not implemented.");
-    }
-    update(): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
-    delete(): Promise<void> {
-        throw new Error("Method not implemented.");
+    async create(user: UserEntity): Promise<UserEntity> {
+        const createdUser = await UserModel.create({
+            id: user.getId(),
+            firstName: user.getFirstName(),
+            lastName: user.getLastName(),
+            email: user.getEmail(),
+        });
+
+        return UserEntity.create(createdUser.toJSON());
     }
 
+    async list(): Promise<UserEntity[]> {
+        const users = await UserModel.findAll();
+        return users.map((user) => UserEntity.create(user.toJSON()));
+    }
+
+    async getById(id: string): Promise<UserEntity> {
+        const user = await UserModel.findByPk(id);
+        if (!user) throw new Error("Usuário não encontrado.");
+        
+        return UserEntity.create(user.toJSON());
+    }
+
+    async getByEmail(email: string): Promise<UserEntity> {
+        const user = await UserModel.findOne({ where: { email } });
+        if (!user) throw new Error("Usuário não encontrado.");
+        
+        return UserEntity.create(user.toJSON());
+    }
+
+    async update(user: UserEntity): Promise<void> {
+        const [updatedRows] = await UserModel.update(
+            {
+                firstName: user.getFirstName(),
+                lastName: user.getLastName(),
+                email: user.getEmail(),
+            },
+            { where: { id: user.getId() } }
+        );
+
+        if (!updatedRows) throw new Error("Usuário não encontrado para atualização.");
+    }
+
+    async delete(user: UserEntity): Promise<void> {
+        const deletedRows = await UserModel.destroy({ where: { id: user.getId() } });
+
+        if (!deletedRows) throw new Error("Usuário não encontrado para exclusão.");
+    }
 }

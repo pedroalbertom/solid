@@ -6,14 +6,10 @@ export type UserProps = {
 }
 
 export class UserEntity {
-    private props: UserProps
-
-    private constructor(props: UserProps) {
-        this.props = props
-    }
+    private constructor(readonly props: UserProps) {}
 
     public static create(props: Omit<UserProps, 'id'>): UserEntity {
-        const id = crypto.randomUUID()
+        const id = crypto.randomUUID().toString()
         return new UserEntity({ ...props, id })
     }
 

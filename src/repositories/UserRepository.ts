@@ -11,11 +11,7 @@ export interface IUserRepository {
 }
 
 export class UserRepository implements IUserRepository {
-    private userModel: typeof UserModel;
-
-    constructor(userModel: typeof UserModel) {
-        this.userModel = userModel;
-    }
+    constructor(private userModel: typeof UserModel) {}
 
     async create(user: UserEntity): Promise<UserEntity> {
         const createdUser = await this.userModel.create({

@@ -18,9 +18,7 @@ export interface IUserService {
 }
 
 export class UserService implements IUserService {
-    constructor(private userRepository: IUserRepository) {
-        this.userRepository = userRepository;
-    }
+    constructor(private userRepository: IUserRepository) {}
 
     async create(firstName: string, lastName: string, email: string): Promise<UserEntity> {
         const props = { firstName, lastName, email }
@@ -37,23 +35,18 @@ export class UserService implements IUserService {
     }
 
     async getByEmail(email: string): Promise<UserEntity> {
-        return await this.userRepository.getById(email)
+        return await this.userRepository.getByEmail(email)
     }
 
     async update(data: UpdateUserDTO): Promise<void> {
         const existingUser = await this.userRepository.getById(data.id);
-        if (!existingUser) {
-            throw new Error("Usuário não encontrado.");
-        }
-
-        const updatedUser = UserEntity.create({
-            id: data.id,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            email: data.email,
-        });
-
-        await this.userRepository.update(updatedUser);
+        if (!existingUser) throw new Error("Usuário não encontrado.");
+        
+        existingUser.props.firstName = data.firstName;
+        existingUser.props.lastName = data.lastName;
+        existingUser.props.email = data.email;
+    
+        await this.userRepository.update(existingUser);
     }
 
     async delete(id: string): Promise<void> {

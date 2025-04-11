@@ -2,8 +2,10 @@ import { Request, Response } from "express";
 import { UserService } from "../services/UserService";
 
 export class UserController {
-    constructor(private userService: UserService) {
-        this.userService = userService;
+    constructor(private userService: UserService) {}
+
+    private handleError(res: Response, error: any): Response {
+        return res.status(400).json({ error: error.message });
     }
 
     async create(req: Request, res: Response): Promise<Response> {
@@ -12,7 +14,7 @@ export class UserController {
             const user = await this.userService.create(firstName, lastName, email);
             return res.status(201).json(user);
         } catch (error: any) {
-            return res.status(400).json({ error: error.message });
+            return this.handleError(res, error);
         }
     }
 
@@ -21,17 +23,17 @@ export class UserController {
             const users = await this.userService.list();
             return res.status(200).json(users);
         } catch (error: any) {
-            return res.status(400).json({ error: error.message });
+            return this.handleError(res, error);
         }
     }
 
     async listOne(req: Request, res: Response): Promise<Response> {
         try {
-            const id = req.body.id
+            const id = req.params.id;
             const user = await this.userService.getById(id);
             return res.status(200).json(user);
         } catch (error: any) {
-            return res.status(400).json({ error: error.message });
+            return this.handleError(res, error);
         }
     }
 
@@ -41,17 +43,17 @@ export class UserController {
             await this.userService.update({ id, firstName, lastName, email });
             return res.status(200).json({ message: "Usuário atualizado com sucesso!" });
         } catch (error: any) {
-            return res.status(400).json({ error: error.message });
+            return this.handleError(res, error);
         }
     }
 
     async delete(req: Request, res: Response): Promise<Response> {
         try {
-            const id = req.body.id
+            const id = req.params.id;
             await this.userService.delete(id);
-            return res.status(200);
+            return res.status(200).json({ message: "Usuário deletado com sucesso!" });
         } catch (error: any) {
-            return res.status(400).json({ error: error.message });
+            return this.handleError(res, error);
         }
     }
 }

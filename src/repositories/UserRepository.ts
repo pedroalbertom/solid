@@ -11,7 +11,7 @@ export interface IUserRepository {
 }
 
 export class UserRepository implements IUserRepository {
-    constructor(private userModel: typeof UserModel) {}
+    constructor(private userModel: typeof UserModel) { }
 
     async create(user: UserEntity): Promise<UserEntity> {
         const createdUser = await this.userModel.create({
@@ -44,7 +44,7 @@ export class UserRepository implements IUserRepository {
     }
 
     async update(user: UserEntity): Promise<void> {
-        const [updatedRows] = await this.userModel.update(
+        await this.userModel.update(
             {
                 firstName: user.getFirstName(),
                 lastName: user.getLastName(),
@@ -52,8 +52,6 @@ export class UserRepository implements IUserRepository {
             },
             { where: { id: user.getId() } }
         );
-
-        if (!updatedRows) throw new Error("Usuário não encontrado para atualização.");
     }
 
     async delete(id: string): Promise<void> {

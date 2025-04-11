@@ -38,6 +38,7 @@ export class UserController {
 
     async update(req: Request, res: Response): Promise<Response> {
         try {
+            req.body.id = req.params.id;
             await this.userService.update(req.body);
             return res.status(200).json({ message: "Usuário atualizado com sucesso!" });
         } catch (error: any) {

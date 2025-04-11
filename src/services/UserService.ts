@@ -15,8 +15,11 @@ export class UserService implements IUserService {
     constructor(private userRepository: IUserRepository) { }
 
     async create(data: CreateUserDTO): Promise<UserEntity> {
-        const user = UserEntity.create({ ...data })
-        return await this.userRepository.create(user)
+        const user = UserEntity.create({
+            ...data,
+            id: undefined,
+        });
+        return await this.userRepository.create(user);
     }
 
     async list(): Promise<UserEntity[]> {
@@ -36,12 +39,9 @@ export class UserService implements IUserService {
         if (!existingUser) throw new Error("Usuário não encontrado!");
 
         if (data.email !== existingUser.getEmail()) {
-            try {
-                await this.getByEmail(data.email);
-                throw new Error("Email já está em uso");
-            } catch (error) {
-                throw error;
-            }
+            const userWithEmail = await this.userRepository.getByEmail(data.email)
+                .catch(() => null);
+            if (userWithEmail) throw new Error("Email já está em uso");
         }
 
         const updatedUser = UserEntity.create({

@@ -10,8 +10,7 @@ export class UserController {
 
     async create(req: Request, res: Response): Promise<Response> {
         try {
-            const { firstName, lastName, email } = req.body;
-            const user = await this.userService.create(firstName, lastName, email);
+            const user = await this.userService.create(req.body);
             return res.status(201).json(user);
         } catch (error: any) {
             return this.handleError(res, error);
@@ -39,8 +38,7 @@ export class UserController {
 
     async update(req: Request, res: Response): Promise<Response> {
         try {
-            const { id, firstName, lastName, email } = req.body;
-            await this.userService.update({ id, firstName, lastName, email });
+            await this.userService.update(req.body);
             return res.status(200).json({ message: "Usuário atualizado com sucesso!" });
         } catch (error: any) {
             return this.handleError(res, error);

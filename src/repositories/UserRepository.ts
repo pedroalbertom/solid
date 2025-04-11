@@ -1,5 +1,5 @@
 import { UserEntity } from "../entities/UserEntity";
-import { UserModel } from "../models/UserModels";
+import { UserModel } from "../models/UserModel";
 
 export interface IUserRepository {
     create(user: UserEntity): Promise<UserEntity>;

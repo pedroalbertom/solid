@@ -1,15 +1,9 @@
+import { CreateUserDTO, UpdateUserDTO } from "../dtos/UserDTO";
 import { UserEntity } from "../entities/UserEntity";
 import { IUserRepository } from "../repositories/UserRepository";
 
-interface UpdateUserDTO {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-}
-
 export interface IUserService {
-    create(firstName: string, lastName: string, email: string): Promise<UserEntity>
+    create(data: CreateUserDTO): Promise<UserEntity>
     list(): Promise<UserEntity[]>
     getById(id: string): Promise<UserEntity> | null
     getByEmail(email: string): Promise<UserEntity>
@@ -18,11 +12,10 @@ export interface IUserService {
 }
 
 export class UserService implements IUserService {
-    constructor(private userRepository: IUserRepository) {}
+    constructor(private userRepository: IUserRepository) { }
 
-    async create(firstName: string, lastName: string, email: string): Promise<UserEntity> {
-        const props = { firstName, lastName, email }
-        const user = UserEntity.create(props)
+    async create(data: CreateUserDTO): Promise<UserEntity> {
+        const user = UserEntity.create({ ...data })
         return await this.userRepository.create(user)
     }
 
@@ -40,13 +33,23 @@ export class UserService implements IUserService {
 
     async update(data: UpdateUserDTO): Promise<void> {
         const existingUser = await this.userRepository.getById(data.id);
-        if (!existingUser) throw new Error("Usuário não encontrado.");
-        
-        existingUser.props.firstName = data.firstName;
-        existingUser.props.lastName = data.lastName;
-        existingUser.props.email = data.email;
-    
-        await this.userRepository.update(existingUser);
+        if (!existingUser) throw new Error("Usuário não encontrado!");
+
+        if (data.email !== existingUser.getEmail()) {
+            try {
+                await this.getByEmail(data.email);
+                throw new Error("Email já está em uso");
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        const updatedUser = UserEntity.create({
+            ...existingUser.props,
+            ...data
+        });
+
+        await this.userRepository.update(updatedUser);
     }
 
     async delete(id: string): Promise<void> {

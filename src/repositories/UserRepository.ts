@@ -1,12 +1,12 @@
 import { UserEntity } from "../entities/UserEntity";
 
 export interface IUserRepository {
-    create(): Promise<UserEntity>,
+    create(user: UserEntity): Promise<UserEntity>,
     list(): Promise<UserEntity[]>,
-    getById(): Promise<UserEntity>,
-    getByEmail(): Promise<UserEntity>,
-    update(): Promise<void>,
-    delete(): Promise<void>,
+    getById(id: string): Promise<UserEntity>,
+    getByEmail(id: string): Promise<UserEntity>,
+    update(user: UserEntity): Promise<void>,
+    delete(id: string): Promise<void>,
 }
 
 export class UserRepository implements IUserRepository {
